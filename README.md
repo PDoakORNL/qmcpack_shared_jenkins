@@ -45,7 +45,7 @@ Install Plugins in addition to the "standard" plugins
 ```groovy
 library 'qmcpack_shared_jenkins'
 
-common_pipeline(name='your_variant')
+common_pipeline(name: "your_variant")
 ```
 - commit and push this to your PR Branch
 
