@@ -39,6 +39,18 @@ Install Plugins in addition to the "standard" plugins
 ## Adding Pipelines
 
 - From the main dashboard click on *Open Blue Ocean*
+- Click New Pipeline
+- Answer questions
+  - We store our code on GitHub
+  - The organization is QMCPACK
+  - The repository is qmcpack
+  - Choose a descriptive name
+- Now click jenkins at the top of the page
+- Click the outgoing box icon in the top right
+- You'll return to the "classic UI"
+- Click the name of your new pipline
+- Click Configure
+
 
 - under "Source Code Management"
     - click the "Git" radio button
