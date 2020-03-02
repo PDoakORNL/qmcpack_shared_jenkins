@@ -73,65 +73,13 @@ common_pipeline(name='your_variant')
   - Credentials: BlueOcean Folder Credentials
   - Repository HTTPS URL: https://github.com/QMCPACK/qmcpack_shared_jenkins.git
   - Validate that, it should work if you created the auth token for qmc-robot properly
+  - at the bottom of the Behaviors section click the Add button
+  - select Custom Github Notification Context
+  - Label it too something you want to see for the PR checks on github.
   - Scroll to the bottom and click Save
-  
+
 ### In Your Editor
 - if there is not already a `jenkins_facility_machine.sh` script prepare one based on `jenkins_ornl_oxygen.sh`
+- prepare the facility_machine_spack_env.sh file that loads the correct spack packages 
+  and sets the QMC_IMMUTABLE_FLAGS for your build.
 
-- under "Source Code Management"
-    - click the "Git" radio button
-    - "https://github.com/QMCPACK/qmcpack/" for the "Repository URL"
-    - "none" for Credentials
-    - click the Advanced button
-    - "+refs/pull/*:refs/remotes/origin/pr/*" for the "Respec"
-    - use "${sha1}" for "Branch Specifier (blank for 'any')"
-    - choose "Advanced clone behaviors" from the "Additional Behaviors" menu
-        - uncheck "Fetch tags"
-        - check "Shallow clone" and set depth to "1"
-
-- under "Build Triggers"
-    - check "GitHub Pull Request Builder"
-    - leave it as "Anonymous connection"
-    - add to "Admin list" the following:
-        prckent
-        markdewing
-        ye-luo
-        grahamlopez
-        PDoakORNL
-        rcclay
-    - click the "Advanced" button
-        - change "Crontab line" to "H/2 * * * *"
-    - click the "Trigger Setup" button
-        - Add "Update commit status during build" and set the "Commit Status
-          Context" to something like "oxygen-cpu"
-
-- under "Build Environment"
-    - check "Delete workspace before build starts"
-
-- under "Build"
-    - Add "Execute shell"
-    - put something like "./tests/test_automation/jenkins_oxygen_cpu.sh" in the box
-
-- under "Post-build Actions"
-    - add "Editable Email Notification" action
-    - select "Attach Build Log"
-    - click "Advanced Settings..." button
-    - click the "Advanced" button under "Failure - Any"
-    - click the red "X" on the "Developers" box if present
-    - add "${ENV, var="ghprbActualCommitAuthorEmail"}, lopezmg@ornl.gov, kentpr@ornl.gov, markdewing@gmail.com, yeluo@anl.gov, moralessilva2@llnl.gov, doakpw@ornl.gov"
-      to the "Recipient List" box
-    - select "Attach Build Log"
-    - add "Delete workspace when build is done" action
-
-## other variants
-
-- click "New Item", and use the "Copy from" box at the bottom to clone an
-  existing project
-
-- the only change should be
-    - under "Build Triggers"
-        - click the "Trigger Setup" button
-        - Add "Update commit status during build" and set the "Commit Status
-          Context" to something like "oxygen-variant"
-    - under "Build"
-        - put something like "./tests/test_automation/jenkins_oxygen_variant.sh" in the box
