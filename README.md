@@ -38,6 +38,18 @@ Install Plugins in addition to the "standard" plugins
 
 ## Adding Pipelines
 
+### In your editor
+- Prepare the variant Jenkinsfile
+- it should be in tests/test_automation and names Jenkinsfile_facility_machine_your_variant
+- it should contain
+```groovy
+library 'qmcpack_shared_jenkins'
+
+common_pipeline(name='your_variant')
+```
+- commit and push this to your PR Branch
+
+### Back in your browser
 - From the main dashboard click on *Open Blue Ocean*
 - Click New Pipeline
 - Answer questions
@@ -50,7 +62,21 @@ Install Plugins in addition to the "standard" plugins
 - You'll return to the "classic UI"
 - Click the name of your new pipline
 - Click Configure
-
+- under Build Configuration, it should have Mode by Jenkinsfile
+- add Script Path tests/test_automation/Jenkinsfile_ornl_oxygen_your_variant
+- under Pipeline Libraries fill in
+  - Name: qmcpack_shared_jenkins
+  - Default Version: master
+  - Load Implicitly: check
+  - Retrieval Method: Modern SCM
+  - Source Code Management: Github
+  - Credentials: BlueOcean Folder Credentials
+  - Repository HTTPS URL: https://github.com/QMCPACK/qmcpack_shared_jenkins.git
+  - Validate that, it should work if you created the auth token for qmc-robot properly
+  - Scroll to the bottom and click Save
+  
+### In Your Editor
+- if there is not already a `jenkins_facility_machine.sh` script prepare one based on `jenkins_ornl_oxygen.sh`
 
 - under "Source Code Management"
     - click the "Git" radio button

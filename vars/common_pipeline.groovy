@@ -5,9 +5,12 @@ def call(Map pipelineParams) {
     agent {
       node {
 	label 'master'
-	customWorkspace "/dev/shm/jenkins/${piplineParams.name}"
+	customWorkspace "/dev/shm/jenkins/${pipelineParams.name}"
       }
     }
+    /** build options that are invariant for this pipeline are carried by the
+     *  environment variables.
+     */
     environment {
       JNK_THREADS=4
       SPACK_ROOT='/scratch/jenkins_spack'
@@ -41,7 +44,7 @@ def call(Map pipelineParams) {
 		echo "building ${NSPACE} ${PRECISION} precision ..."
 		dir ('./build')
 		{
-		  sh "../tests/test_automation/jenkins_ornl_oxygen_${pipelineParams.name}.sh ${NSPACE} ${PRECISION} ${JNK_THREADS}"
+		  sh "../tests/test_automation/jenkins_ornl_oxygen.sh ${NSPACE} ${PRECISION}"
 		}
               }
             }
