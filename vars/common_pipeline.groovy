@@ -26,19 +26,23 @@ def call(Map pipelineParams) {
     }
     stages {
       stage('CheckOut') {
-	try {
-	  // keep trying for 20 minutes
-	  retry(10) {
-	    try {
-	      steps {
-		checkout scm
+	steps {
+	  script {
+	    node {
+	      try {
+		// keep trying for 20 minutes
+		retry(10) {
+		  try {
+		    checkout scm
+		  } catch(Exception ex) {
+		    sleep(120)
+		  }
+		}
+	      } catch(Exception ex) {
+		currentBuild.result = 'FAILURE'
 	      }
-	    } catch(Exception ex) {
-	      sleep(120)
 	    }
 	  }
-	} catch(Exception ex) {
-	  currentBuild.result = 'FAILURE'
 	}
       }
       stage('BuildAndTest') {
@@ -81,7 +85,7 @@ def call(Map pipelineParams) {
     }
     post {
       failure {
-	currentBuild.result = 'FAILURE'
+	script { currentBuild.result = 'FAILURE' }
 	emailext(body: '${DEFAULT_CONTENT}', mimeType: 'text/html',
 		 attachLog: true, subject: '${DEFAULT_SUBJECT}',
 		 to: "${qmcJGlobals.maintainer_emails}",
