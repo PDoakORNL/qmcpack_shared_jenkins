@@ -10,7 +10,8 @@ def call(Map pipelineParams) {
     agent {
       node {
 	label 'master'
-	customWorkspace "/dev/shm/jenkins/${pipelineParams.name}"
+	//def prefix_str=piplineParams.get("prefix","")
+	customWorkspace "/dev/shm/jenkins/${pipelineParams.prefix}${pipelineParams.name}"
       }
     }
     /** build options that are invariant for this pipeline are carried by the
