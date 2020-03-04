@@ -2,6 +2,11 @@
 
 def call(Map pipelineParams) {
   pipeline {
+    // pollSCM approximately every five minutes.
+    // \todo get fire wall exception so webhooks actually work
+    trigger {
+      pollSCM('H/5 * * * *')
+    }
     agent {
       node {
 	label 'master'
@@ -22,6 +27,7 @@ def call(Map pipelineParams) {
     stages {
       stage('CheckOut') {
 	try {
+	  // keep trying for 20 minutes
 	  retry(10) {
 	    try {
 	      steps {
@@ -39,6 +45,8 @@ def call(Map pipelineParams) {
 	failFast true
 	matrix {
 	  axes {
+	    // These are not just the CMake flags as we don't want CI code
+	    // and build code strongly coupled.
 	    axis {
 	      name 'NSPACE'
 	      values 'real', 'complex'
@@ -88,5 +96,4 @@ def call(Map pipelineParams) {
       }
     }
   }
-
 }
