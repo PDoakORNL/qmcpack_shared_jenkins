@@ -4,7 +4,7 @@ def call(Map pipelineParams) {
   pipeline {
     // pollSCM approximately every five minutes.
     // \todo get fire wall exception so webhooks actually work
-    trigger {
+    triggers {
       pollSCM('H/5 * * * *')
     }
     agent {
