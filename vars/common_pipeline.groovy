@@ -20,7 +20,7 @@ def call(Map pipelineParams) {
     environment {
       JNK_THREADS=4
       SPACK_ROOT='/scratch/jenkins_spack'
-      SPACK_ENV_FILE="../tests/test_automation/ornl_oxygen_spack_env_${pipelineParams.name}.sh"
+      SPACK_ENV_FILE="../tests/test_automation/vm_spack_env_${pipelineParams.name}.sh"
     }
     options {
       buildDiscarder(logRotator(numToKeepStr: '10'))
