@@ -1,5 +1,11 @@
 #!groovy
 
+def returnSpackEnv(Map pipelineParams)
+{    
+    prefix = pipelineParams.get('prefix','')
+    return "../tests/test_automation/${prefix}spack_env_${pipelineParams.name}.sh"
+}    
+
 def call(Map pipelineParams) {
   pipeline {
     // pollSCM approximately every five minutes.
@@ -23,10 +29,7 @@ def call(Map pipelineParams) {
     environment {
       JNK_THREADS=4
       SPACK_ROOT="${pipelineParams.spack_path}"
-      SPACK_ENV_FILE=script {
-          prefix = pipelineParams.get('prefix','')
-          return "../tests/test_automation/${prefix}spack_env_${pipelineParams.name}.sh"
-      }
+      SPACK_ENV_FILE = returnSpackEnv(pipelineParams)
     }
     options {
       buildDiscarder(logRotator(numToKeepStr: '10'))
