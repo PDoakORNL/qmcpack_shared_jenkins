@@ -9,9 +9,12 @@ def call(Map pipelineParams) {
     }
     agent {
       node {
-	label 'master'
-	//def prefix_str=piplineParams.get("prefix","")
-	customWorkspace "/dev/shm/jenkins/${pipelineParams.prefix}${pipelineParams.name}"
+    label 'master'
+    //def prefix_str=piplineParams.get("prefix","")
+    customWorkspace script {
+        prefix = pipelineParams.get('prefix','')
+        return "/dev/shm/jenkins/${prefix}${pipelineParams.name}"
+    }
       }
     }
     /** build options that are invariant for this pipeline are carried by the
@@ -19,85 +22,88 @@ def call(Map pipelineParams) {
      */
     environment {
       JNK_THREADS=4
-      SPACK_ROOT='/scratch/jenkins_spack'
-      SPACK_ENV_FILE="../tests/test_automation/vm_spack_env_${pipelineParams.name}.sh"
+      SPACK_ROOT="${pipelineParams.spack_path}"
+      SPACK_ENV_FILE=script {
+          prefix = pipelineParams.get('prefix','')
+          return "../tests/test_automation/${prefix}spack_env_${pipelineParams.name}.sh"
+      }
     }
     options {
       buildDiscarder(logRotator(numToKeepStr: '10'))
     }
     stages {
       stage('CheckOut') {
-	steps {
-	  script {
-	    node {
-	      try {
-		// keep trying for 20 minutes
-		retry(10) {
-		  try {
-		    checkout scm
-		  } catch(Exception ex) {
-		    sleep(120)
-		  }
-		}
-	      } catch(Exception ex) {
-		currentBuild.result = 'FAILURE'
-	      }
-	    }
-	  }
-	}
+    steps {
+      script {
+        node {
+          try {
+        // keep trying for 20 minutes
+        retry(10) {
+          try {
+            checkout scm
+          } catch(Exception ex) {
+            sleep(120)
+          }
+        }
+          } catch(Exception ex) {
+        currentBuild.result = 'FAILURE'
+          }
+        }
+      }
+    }
       }
       stage('BuildAndTest') {
-	failFast true
-	matrix {
-	  axes {
-	    // These are not just the CMake flags as we don't want CI code
-	    // and build code strongly coupled.
-	    axis {
-	      name 'NSPACE'
-	      values 'real', 'complex'
-	    }
-	    axis {
-	      name 'PRECISION'
-	      values 'full', 'mixed'
-	    }
-	  }
-	  stages {
+    failFast true
+    matrix {
+      axes {
+        // These are not just the CMake flags as we don't want CI code
+        // and build code strongly coupled.
+        axis {
+          name 'NSPACE'
+          values 'real', 'complex'
+        }
+        axis {
+          name 'PRECISION'
+          values 'full', 'mixed'
+        }
+      }
+      stages {
             stage('Build') {
               steps {
-		echo "building ${NSPACE} ${PRECISION} precision ..."
-		dir ('./build')
-		{
-		  sh "../tests/test_automation/jenkins_ornl_oxygen.sh ${NSPACE} ${PRECISION}"
-		}
+        echo "building ${NSPACE} ${PRECISION} precision ..."
+        dir ('./build')
+        {
+          sh "../tests/test_automation/jenkins_ornl_oxygen.sh ${NSPACE} ${PRECISION}"
+        }
               }
             }
             stage('Test') {
               steps {
-		echo "testing ${NSPACE} ${PRECISION} precision ..."
-		dir('./build')
-		{
-		  sh '../tests/test_automation/jenkins_ornl_test.sh ${NSPACE} ${PRECISION} ${JNK_THREADS}'
-		}
+        echo "testing ${NSPACE} ${PRECISION} precision ..."
+        dir('./build')
+        {
+          sh '../tests/test_automation/jenkins_ornl_test.sh ${NSPACE} ${PRECISION} ${JNK_THREADS}'
+        }
               }
-	    }
-	  }
-	}
+        }
+      }
+    }
       }
     }
     post {
       failure {
-	script { currentBuild.result = 'FAILURE' }
-	emailext(body: '${DEFAULT_CONTENT}', mimeType: 'text/html',
-		 attachLog: true, subject: '${DEFAULT_SUBJECT}',
-		 to: "${qmcJGlobals.maintainer_emails}",
-		 recipientProviders: [[$class: 'CulpritsRecipientProvider'],
-				      [$class: 'RequesterRecipientProvider']])
+    script { currentBuild.result = 'FAILURE' }
+    emailext(body: '${DEFAULT_CONTENT}', mimeType: 'text/html',
+         attachLog: true, subject: '${DEFAULT_SUBJECT}',
+         to: "${qmcJGlobals.maintainer_emails}",
+         recipientProviders: [[$class: 'CulpritsRecipientProvider'],
+                      [$class: 'RequesterRecipientProvider']])
       }
       aborted {
-	emailext(body: '${DEFAULT_CONTENT}', mimeType: 'text/html',
-		 subject: '${DEFAULT_SUBJECT}',
-		 to: emailextrecipients([[$class: 'CulpritsRecipientProvider'],
-					 [$class: 'RequesterRecipientProvider']]))
+    emailext(body: '${DEFAULT_CONTENT}', mimeType: 'text/html',
+         subject: '${DEFAULT_SUBJECT}',
+         to: emailextrecipients([[$class: 'CulpritsRecipientProvider'],
+                     [$class: 'RequesterRecipientProvider']]))
       }
     }
   }
