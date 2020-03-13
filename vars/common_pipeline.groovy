@@ -14,18 +14,22 @@ def call(Map pipelineParams) {
       pollSCM('H/5 * * * *')
     }
     agent {
-      node {
-    label 'master'
+            node {
+                label 'master'
     //def prefix_str=piplineParams.get("prefix","")
     customWorkspace script {
-        prefix = pipelineParams.get('prefix','')
-        return "/var/lib/jenkins/${prefix}${pipelineParams.name}"
-    }
-      }
-    }
+                    prefix = pipelineParams.get('prefix','')
+                    if (pipelineParams.ram_disk == true) {
+                        return "/dev/shm/jenkins/${prefix}${pipelineParams.name}"
+                    } else {
+                        return "/var/lib/jenkins/workspace/${prefix}${pipelineParams.name}"y
+                    }
+                }
+            }
+        }
     /** build options that are invariant for this pipeline are carried by the
      *  environment variables.
-     */
+         */
     environment {
       JNK_THREADS=4
       SPACK_ROOT="${pipelineParams.spack_path}"
