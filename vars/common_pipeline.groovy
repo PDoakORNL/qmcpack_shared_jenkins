@@ -19,7 +19,7 @@ def call(Map pipelineParams) {
     //def prefix_str=piplineParams.get("prefix","")
     customWorkspace script {
         prefix = pipelineParams.get('prefix','')
-        return "/dev/shm/jenkins/${prefix}${pipelineParams.name}"
+        return "/var/lib/jenkins/${prefix}${pipelineParams.name}"
     }
       }
     }
