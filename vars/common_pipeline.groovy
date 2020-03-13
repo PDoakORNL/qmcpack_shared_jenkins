@@ -22,7 +22,7 @@ def call(Map pipelineParams) {
                     if (pipelineParams.ram_disk == true) {
                         return "/dev/shm/jenkins/${prefix}${pipelineParams.name}"
                     } else {
-                        return "/var/lib/jenkins/workspace/${prefix}${pipelineParams.name}"y
+                        return "/var/lib/jenkins/workspace/${prefix}${pipelineParams.name}"
                     }
                 }
             }
